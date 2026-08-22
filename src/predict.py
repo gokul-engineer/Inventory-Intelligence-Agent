@@ -12,7 +12,7 @@ print("LOADING MODEL")
 print("=" * 60)
 
 model = joblib.load(
-    MODEL_DIR / "baseline_model.pkl"
+    MODEL_DIR / "xgboost_model.pkl"
 )
 
 df = pd.read_parquet(
@@ -48,13 +48,24 @@ predictions = model.predict(df[feature_columns])
 
 df["prediction"] = predictions
 
+from inventory import calculate_inventory_metrics
+
+df = calculate_inventory_metrics(
+    df,
+    current_stock=20,
+    lead_time=7,
+    safety_stock=15
+)
+
 print(
     df[
         [
             "date",
             "item_id",
             "sales",
-            "prediction"
+            "prediction",
+            "reorder_point",
+            "recommended_order_qty"
         ]
     ].head(20)
 )

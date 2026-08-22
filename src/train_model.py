@@ -6,6 +6,8 @@ from utils import PROCESSED_DATA
 from features.pipeline import create_features
 
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 
 from model_utils import evaluate_model
 
@@ -71,13 +73,81 @@ print(f"Testing Rows  : {len(test):,}")
 # Baseline Model
 # -------------------------
 
-model = LinearRegression()
+results = []
 
-model.fit(X_train, y_train)
+# ------------------------------------
+# Linear Regression
+# ------------------------------------
 
-predictions = model.predict(X_test)
+linear = LinearRegression()
 
-evaluate_model(y_test, predictions)
+linear.fit(X_train, y_train)
+
+pred = linear.predict(X_test)
+
+results.append(
+    evaluate_model(
+        "Linear Regression",
+        y_test,
+        pred
+    )
+)
+
+# ------------------------------------
+# Random Forest
+# ------------------------------------
+
+forest = RandomForestRegressor(
+    n_estimators=100,
+    random_state=42,
+    n_jobs=-1
+)
+
+forest.fit(X_train, y_train)
+
+pred = forest.predict(X_test)
+
+results.append(
+    evaluate_model(
+        "Random Forest",
+        y_test,
+        pred
+    )
+)
+
+# ------------------------------------
+# XGBoost
+# ------------------------------------
+
+xgb = XGBRegressor(
+    n_estimators=100,
+    learning_rate=0.1,
+    max_depth=6,
+    random_state=42
+)
+
+xgb.fit(X_train, y_train)
+
+pred = xgb.predict(X_test)
+
+results.append(
+    evaluate_model(
+        "XGBoost",
+        y_test,
+        pred
+    )
+)
+
+print("\n")
+print("=" * 60)
+print("MODEL COMPARISON")
+print("=" * 60)
+
+comparison = pd.DataFrame(results)
+
+print(
+    comparison.sort_values("RMSE")
+)
 
 print("=" * 60)
 print("SAVING MODEL")
@@ -88,8 +158,8 @@ MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 MODEL_DIR.mkdir(exist_ok=True)
 
 joblib.dump(
-    model,
-    MODEL_DIR / "baseline_model.pkl"
+    xgb,
+    MODEL_DIR / "xgboost_model.pkl"
 )
 
-print("Model Saved Successfully!")
+print("XGBoost Model Saved Successfully!")

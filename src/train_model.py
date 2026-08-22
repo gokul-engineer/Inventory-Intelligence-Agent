@@ -1,4 +1,6 @@
 import pandas as pd
+import joblib
+from pathlib import Path
 
 from utils import PROCESSED_DATA
 from features.pipeline import create_features
@@ -76,3 +78,18 @@ model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
 evaluate_model(y_test, predictions)
+
+print("=" * 60)
+print("SAVING MODEL")
+print("=" * 60)
+
+MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
+
+MODEL_DIR.mkdir(exist_ok=True)
+
+joblib.dump(
+    model,
+    MODEL_DIR / "baseline_model.pkl"
+)
+
+print("Model Saved Successfully!")

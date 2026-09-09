@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+from utils import RAW_DATA
 
 
 class DataLoader:
@@ -7,7 +8,7 @@ class DataLoader:
 
     def __init__(self):
         self.base_path = Path(__file__).resolve().parent.parent
-        self.raw_path = self.base_path / "data" / "raw"
+        self.raw_path = RAW_DATA
 
     def load_calendar(self):
         return pd.read_csv(self.raw_path / "calendar.csv")

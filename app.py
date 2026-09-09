@@ -101,12 +101,7 @@ safety_stock = st.sidebar.slider(
     15
 )
 
-df = calculate_inventory_metrics(
-    df,
-    current_stock=current_stock,
-    lead_time=lead_time,
-    safety_stock=safety_stock
-)
+df = predict_inventory()
 
 
 st.title("📦 Inventory Intelligence Agent")
